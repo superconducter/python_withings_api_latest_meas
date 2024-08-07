@@ -727,7 +727,6 @@ def query_measure_groups(
         iter_group_attrib = (cast(MeasureGetMeasGroupAttrib, with_group_attrib),)
     else:
         iter_group_attrib = cast(Tuple[MeasureGetMeasGroupAttrib], with_group_attrib)
-
     return tuple(
         MeasureGetMeasGroup(
             attrib=group.attrib,
@@ -740,6 +739,7 @@ def query_measure_groups(
                 measure
                 for measure in group.measures
                 if measure.type in iter_measure_type
+
             ),
         )
         for group in iter_groups
@@ -760,17 +760,15 @@ def get_measure_value(
     groups: Final = query_measure_groups(
         from_source, with_measure_type, with_group_attrib
     )
-
-    return next(
-        iter(
+    itr = iter(
             tuple(
                 float(measure.value * pow(10, measure.unit))
                 for group in groups
-                for measure in group.measures
-            )
-        ),
-        None,
-    )
+                for measure in group.measures    
+            ))  
+    *_, last = itr
+
+    return last 
 
 
 class StatusException(Exception):
